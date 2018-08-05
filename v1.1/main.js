@@ -2,22 +2,24 @@ const SHA256 = require("crypto-js/sha256"); // Hash (kimlik şifreleme) fonksiyo
 
 class Blok {
     /**
-     * @param indeks Bloğun zincirdeki konum değeri
-     * @param tarihDamgası BLoğun oluşturulduğu tarih
-     * @param veri Bloğıun tuttuğu veri
-     * @param öncekiKimlik Bir önceki bloğun kimlik değeri
-     * @param kimlik Bloğun özlük bilgisi (kimlik değeri)
+     * @param indeks (index) Bloğun zincirdeki konum değeri 
+     * @param (timestamp) tarihDamgası BLoğun oluşturulduğu tarih 
+     * @param (data) veri Bloğıun tuttuğu veri 
+     * @param (prevHash) öncekiKimlik Bir önceki bloğun kimlik değeri 
+     * @param kimlik (hash) Bloğun özlük bilgisi (kimlik değeri) 
+     * @param anlıkZaman (nonce) [kimlikHesapla] her çalıştığında farklı kimlik hesaplanması için kullanılır
      */
     // İndex: Where is the Bloks sit on the zincir.
     // tarihDamgası: Tell us when the Blok are created
     // veri: Any type of veri which you want to associate with this Blok.
     // öncekiKimlik: The string which contains the kimlik of the Blok before.
     constructor(indeks, tarihDamgası, veri, öncekiKimlik = '') {
-        this.index = index;
+        this.indeks = indeks;
         this.tarihDamgası = tarihDamgası;
         this.veri = veri;
         this.öncekiKimlik = öncekiKimlik;
         this.kimlik = this.kimlikHesapla();
+        this.anlıkZaman = 0; // Blok oluşturmayı zorlaştırmak için eklendi
     }
 
     /**
@@ -28,16 +30,24 @@ class Blok {
             this.index +
             this.öncekiKimlik +
             this.tarihDamgası +
-            JSON.stringify(this.veri)
+            JSON.stringify(this.veri) +
+            this.anlıkZaman // Blok oluşturmayı zorlaştırmak için eklendi
         ).toString();
     }
 
-    blokOluştur(zorluk) {
+    /**
+     * Blok oluşturmak için kullanılır.
+     * @param zorluk Blok oluşturmayı zorlaştırma katsayısı
+     */
+    blokOluştur(zorluk) { // Blok oluşturmayı zorlaştırmak için eklendi
         while (
-            this.kimlik.substring(0, zorluk) !== 
-            // Array'i "0" (normalde ","") ile ayırarak string'e çevirir.
+            this.kimlik.substring(0, zorluk) !==
+            // Array'i "0" (normalde ","") ile ayırarak string'e çevirir. 0 sayısı = zorluk
             Array(zorluk + 1).join("0")
         ) {
+            // Her denemede farklı veri oluştmak için anlık değeri değiştiriyoruz.
+            this.anlıkZaman++; 
+
             this.kimlik = this.kimlikHesapla();
         }
 
@@ -48,6 +58,7 @@ class Blok {
 class Blockchain {
     constructor() {
         this.zincir = [this.başlangıçBloğuOluştur()]; // Blok dizisi
+        this.zorluk = 4; // Blok oluşturmayı zorlaştırmak için eklendi
     }
 
     /**
@@ -68,15 +79,15 @@ class Blockchain {
 
     /**
      * Zincire blok eklemek için kullanılır.
-     * @param newBlok Eklenecek blok
+     * @param yeniBlok Eklenecek blok
      */
-    blokEkle(newBlok) {
-        // The prev kimlik must have the kimlik which the prev Blok has
-        newBlok.öncekiKimlik = this.sonBloğuAl().kimlik;
-        // We need to calculate new kimlik and assing
-        newBlok.kimlik = newBlok.kimlikHesapla();
-        // Adding nevBlok to zincir
-        this.zincir.push(newBlok);
+    blokEkle(yeniBlok) {
+        // Yeni bloğun eskiKimliği en sondaki bloğn kimliğini tutmak zorunda.
+        yeniBlok.öncekiKimlik = this.sonBloğuAl().kimlik;
+        // Yeni blok oluşturma
+        yeniBlok.blokOluştur(this.zorluk); // Blok oluşturmayı zorlaştırmak için eklendi
+        // Bloğu zincire ekleme
+        this.zincir.push(yeniBlok);
     }
 
     /**
@@ -101,27 +112,41 @@ class Blockchain {
 }
 
 class Test {
-    // Blok verilerinin değişkliğe karşı tavrını test ediyoruz.
+    /**
+     *  Blok verilerinin değişkliğe karşı tavrını test ediyoruz.
+     * v1.0
+     */
     test1() {
-        let savjeeCoin = new Blockchain();
-        savjeeCoin.blokEkle(new Blok(1, "08/05/2018", { amount: 4 }));
-        savjeeCoin.blokEkle(new Blok(2, "08/05/2018", { amount: 10 }));
-        savjeeCoin.blokEkle(new Blok(3, "08/05/2018", { amount: 20 }));
+        let yCoin = new Blockchain();
+        yCoin.blokEkle(new Blok(1, "08/05/2018", { tutar: 4 }));
+        yCoin.blokEkle(new Blok(2, "08/05/2018", { tutar: 10 }));
+        yCoin.blokEkle(new Blok(3, "08/05/2018", { tutar: 20 }));
 
-        console.log(JSON.stringify(savjeeCoin, null, 4));
+        console.log(JSON.stringify(yCoin, null, 4));
 
         /**
          * Eğer veriyi değiştirirsek, yeni kimlik farklı bir değer olacaktır.
          * Blockchain değişen kimlik verisini [zincirGeçerliMi]'nin 2. if kısmında fark edecektir.
          */
-        savjeeCoin.zincir[1].veri = { amount: 100 }
-        console.log("Is the first Blockchain valid? " + savjeeCoin.zincirGeçerliMi());
+        yCoin.zincir[1].veri = { tutar: 100 }
+        console.log("Is the first Blockchain valid? " + yCoin.zincirGeçerliMi());
         /**
          * Eğer kimlik verisini de değiştirirsek, bir sonraki bloğun tutmuş olduğu öncekiKimlik
          * ile şu anki kimlik uyuşmayacaktır. Blockchain [zincirGeçerliMi]'nin 2. if kısmında fark edecektir.
          */
-        savjeeCoin.zincir[1].kimlik = savjeeCoin.zincir[1].kimlikHesapla();
-        console.log("Is the second Blockchain valid? " + savjeeCoin.zincirGeçerliMi());
+        yCoin.zincir[1].kimlik = yCoin.zincir[1].kimlikHesapla();
+        console.log("Is the second Blockchain valid? " + yCoin.zincirGeçerliMi());
+    }
+
+    /**
+     * Blokchain'de blok oluşturma testi. (v1.1)
+     */
+    test2() {
+        let yCoin = new Blockchain();
+        yCoin.blokEkle(new Blok(1, "08/05/2018", { tutar: 4 }));
+        yCoin.blokEkle(new Blok(2, "08/05/2018", { tutar: 4 }));
     }
 }
+
+new Test().test2();
 
