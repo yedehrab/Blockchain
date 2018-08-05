@@ -46,7 +46,7 @@ class Blok {
             Array(zorluk + 1).join("0")
         ) {
             // Her denemede farklı veri oluştmak için anlık değeri değiştiriyoruz.
-            this.anlıkZaman++; 
+            this.anlıkZaman++;
 
             this.kimlik = this.kimlikHesapla();
         }
@@ -118,9 +118,15 @@ class Test {
      */
     test1() {
         let yCoin = new Blockchain();
-        yCoin.blokEkle(new Blok(1, "08/05/2018", { tutar: 4 }));
-        yCoin.blokEkle(new Blok(2, "08/05/2018", { tutar: 10 }));
-        yCoin.blokEkle(new Blok(3, "08/05/2018", { tutar: 20 }));
+        yCoin.blokEkle(new Blok(1, "08/05/2018", {
+            tutar: 4
+        }));
+        yCoin.blokEkle(new Blok(2, "08/05/2018", {
+            tutar: 10
+        }));
+        yCoin.blokEkle(new Blok(3, "08/05/2018", {
+            tutar: 20
+        }));
 
         console.log(JSON.stringify(yCoin, null, 4));
 
@@ -128,7 +134,9 @@ class Test {
          * Eğer veriyi değiştirirsek, yeni kimlik farklı bir değer olacaktır.
          * Blockchain değişen kimlik verisini [zincirGeçerliMi]'nin 2. if kısmında fark edecektir.
          */
-        yCoin.zincir[1].veri = { tutar: 100 }
+        yCoin.zincir[1].veri = {
+            tutar: 100
+        }
         console.log("Is the first Blockchain valid? " + yCoin.zincirGeçerliMi());
         /**
          * Eğer kimlik verisini de değiştirirsek, bir sonraki bloğun tutmuş olduğu öncekiKimlik
@@ -143,10 +151,13 @@ class Test {
      */
     test2() {
         let yCoin = new Blockchain();
-        yCoin.blokEkle(new Blok(1, "08/05/2018", { tutar: 4 }));
-        yCoin.blokEkle(new Blok(2, "08/05/2018", { tutar: 4 }));
+        yCoin.blokEkle(new Blok(1, "08/05/2018", {
+            tutar: 4
+        }));
+        yCoin.blokEkle(new Blok(2, "08/05/2018", {
+            tutar: 4
+        }));
     }
 }
 
 new Test().test2();
-
