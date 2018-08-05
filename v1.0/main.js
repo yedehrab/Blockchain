@@ -1,4 +1,4 @@
-const SHA256 = require('crypto-js/sha256');
+const SHA256 = require("crypto-js/sha256");
 
 class Block {
     // Index: Where is the blocks sit on the chain.
@@ -14,7 +14,7 @@ class Block {
     }
 
     // Calculate hash value
-    calculateHash(params) {
+    calculateHash() {
         return SHA256(
             this.index +
             this.previousHash +
@@ -72,28 +72,22 @@ class Blockchain {
     }
 }
 
-class Test {
-    // Testing the changeability of the data of block
-    test1() {
-        let savjeeCoin = new Blockchain();
-        savjeeCoin.addBlock(new Block(1, "08/05/2018", { amount: 4 }));
-        savjeeCoin.addBlock(new Block(2, "08/05/2018", { amount: 10 }));
-        savjeeCoin.addBlock(new Block(3, "08/05/2018", { amount: 20 }));
+let savjeeCoin = new Blockchain();
+savjeeCoin.addBlock(new Block(1, "08/05/2018", { amount: 4 }));
+savjeeCoin.addBlock(new Block(2, "08/05/2018", { amount: 10 }));
+savjeeCoin.addBlock(new Block(3, "08/05/2018", { amount: 20 }));
 
-        console.log(JSON.stringify(savjeeCoin, null, 4));
+console.log(JSON.stringify(savjeeCoin, null, 4));
 
-        /**
-         * If we change the data, the new hash will be difference.
-         * Blockchain will find another hash value in [isChainValid] first if line.
-         */
-        savjeeCoin.chain[1].data = { amount: 100 }
-        console.log("Is the first blockchain valid? " + savjeeCoin.isChainValid());
-        /**
-         * If we change the hash, the connection which is provided by prevHash
-         * opportunity will be break. Because the prevHash wont be equal to new hash.
-         */
-        savjeeCoin.chain[1].hash = savjeeCoin.chain[1].calculateHash();
-        console.log("Is the second blockchain valid? " + savjeeCoin.isChainValid());
-    }
-}
-
+/**
+ * If we change the data, the new hash will be difference.
+ * Blockchain will find another hash value in [isChainValid] first if line.
+ */
+savjeeCoin.chain[1].data = { amount: 100 }
+console.log("Is the first blockchain valid? " + savjeeCoin.isChainValid());
+/**
+ * If we change the hash, the connection which is provided by prevHash
+ * opportunity will be break. Because the prevHash wont be equal to new hash.
+ */
+savjeeCoin.chain[1].hash = savjeeCoin.chain[1].calculateHash();
+console.log("Is the second blockchain valid? " + savjeeCoin.isChainValid());
