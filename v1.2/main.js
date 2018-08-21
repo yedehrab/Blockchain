@@ -1,3 +1,12 @@
+/*
+ * Konu: Basit node kod yapısı
+ * Açıklama: Tasarımı açıklama adına basit bir başlangıç kodu.
+ * Yazar: Yunus Emre
+ * Tarih: 08 / 08 / 2018
+ */
+
+
+// Bağlı içerikler (dosya vs.)
 const SHA256 = require("crypto-js/sha256"); // Hash (kimlik şifreleme) fonksiyonunun tanımlaması
 
 class İşlem {
@@ -6,7 +15,7 @@ class İşlem {
      * @param {string} alıcı İşlemin yapıldığı kişi adresi
      * @param {number} tutar İşlem tutarı
      */
-    constructor(verici, alıcı, tutar) {
+    constructor(verici, alıcı, tutar) { 
         this.verici = verici;
         this.alıcı = alıcı;
         this.tutar = tutar;
@@ -15,10 +24,10 @@ class İşlem {
 
 class Blok {
     /**
-     * @param {number} tarihDamgası (timestamp)  BLoğun oluşturulduğu tarih 
-     * @param {İşlem} işlem (transaction)  Bloğıun tuttuğu veri 
-     * @param {string} öncekiKimlik (prevHash) Bir önceki bloğun kimlik değeri 
-     * @param {string} kimlik (hash) Bloğun özlük bilgisi (kimlik değeri) 
+     * @param {number} tarihDamgası (timestamp)  BLoğun oluşturulduğu tarih
+     * @param {İşlem} işlem (transaction)  Bloğıun tuttuğu veri
+     * @param {string} öncekiKimlik (prevHash) Bir önceki bloğun kimlik değeri
+     * @param {string} kimlik (hash) Bloğun özlük bilgisi (kimlik değeri)
      * @param {number} anlıkZaman (nonce) [kimlikHesapla] her çalıştığında farklı kimlik hesaplanması için kullanılır
      */
     constructor(tarihDamgası, işlem, öncekiKimlik = '') {
@@ -69,6 +78,8 @@ class Blockchain {
         this.bekleyenİşlemler = [];
         this.oluşturmaÖdülü = 100;
     }
+
+
 
     /**
      * Blokchain'in ilk bloğunu oluşturmak için kullanılır.
